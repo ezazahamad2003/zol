@@ -17,7 +17,8 @@ import {
   ChevronDown,
   LayoutDashboard,
   TrendingUp,
-  Inbox
+  Inbox,
+  Phone
 } from "lucide-react";
 
 // --- Components ---
@@ -627,7 +628,11 @@ function Contact() {
             <div className="space-y-4 text-slate-400">
                <div className="flex items-center gap-3">
                  <Mail className="h-5 w-5 text-green-400" />
-                 <span>hello@zolsolutions.com</span>
+                 <a href="mailto:chicostategac@gmail.com" className="hover:text-white transition-colors">chicostategac@gmail.com</a>
+               </div>
+               <div className="flex items-center gap-3">
+                 <Phone className="h-5 w-5 text-green-400" />
+                 <a href="tel:5307179645" className="hover:text-white transition-colors">(530) 717-9645</a>
                </div>
                <div className="flex items-center gap-3">
                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
