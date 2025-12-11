@@ -608,10 +608,36 @@ function FAQ() {
 }
 
 function Contact() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted - Placeholder");
-    alert("Thanks for your interest! This is a demo form.");
+    setStatus('submitting');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch('https://formspree.io/f/xkgdqlpy', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        setStatus('success');
+        form.reset();
+        setTimeout(() => setStatus('idle'), 5000);
+      } else {
+        setStatus('error');
+        setTimeout(() => setStatus('idle'), 5000);
+      }
+    } catch (error) {
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 5000);
+    }
   };
 
   return (
@@ -623,7 +649,7 @@ function Contact() {
           <div>
             <h2 className="text-4xl font-extrabold text-white mb-6">Ready to ship your first AI sprint?</h2>
             <p className="text-lg text-slate-300 mb-8">
-              Tell us where you’re stuck. We’ll come back with a concrete proposal and timeline within 24 hours.
+              Tell us where you're stuck. We'll come back with a concrete proposal and timeline within 24 hours.
             </p>
             <div className="space-y-4 text-slate-400">
                <div className="flex items-center gap-3">
@@ -645,20 +671,32 @@ function Contact() {
             <div className="grid gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">Name</label>
-                <input type="text" id="name" required className="w-full rounded-lg bg-[#020617] border border-white/10 px-4 py-3 text-white focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" placeholder="John Doe" />
+                <input type="text" id="name" name="name" required className="w-full rounded-lg bg-[#020617] border border-white/10 px-4 py-3 text-white focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" placeholder="John Doe" />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">Work Email</label>
-                <input type="email" id="email" required className="w-full rounded-lg bg-[#020617] border border-white/10 px-4 py-3 text-white focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" placeholder="john@company.com" />
+                <input type="email" id="email" name="email" required className="w-full rounded-lg bg-[#020617] border border-white/10 px-4 py-3 text-white focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" placeholder="john@company.com" />
               </div>
               <div>
                 <label htmlFor="bottleneck" className="block text-sm font-medium text-slate-300 mb-2">What's the main bottleneck?</label>
-                <textarea id="bottleneck" rows={4} className="w-full rounded-lg bg-[#020617] border border-white/10 px-4 py-3 text-white focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" placeholder="Describe the manual process you want to automate..." />
+                <textarea id="bottleneck" name="bottleneck" rows={4} className="w-full rounded-lg bg-[#020617] border border-white/10 px-4 py-3 text-white focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" placeholder="Describe the manual process you want to automate..." />
               </div>
-              <button type="submit" className="w-full rounded-lg bg-green-500 px-6 py-4 text-center font-bold text-slate-900 transition-transform hover:scale-[1.02] hover:bg-green-400">
-                Send Inquiry
+              <button 
+                type="submit" 
+                disabled={status === 'submitting'}
+                className="w-full rounded-lg bg-green-500 px-6 py-4 text-center font-bold text-slate-900 transition-transform hover:scale-[1.02] hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {status === 'submitting' ? 'Sending...' : 'Send Inquiry'}
               </button>
-              <p className="text-center text-xs text-slate-500 mt-4">We usually reply within 24 hours.</p>
+              {status === 'success' && (
+                <p className="text-center text-sm text-green-400 font-medium">✓ Thanks! We'll get back to you within 24 hours.</p>
+              )}
+              {status === 'error' && (
+                <p className="text-center text-sm text-red-400 font-medium">Something went wrong. Please try again or email us directly.</p>
+              )}
+              {status === 'idle' && (
+                <p className="text-center text-xs text-slate-500 mt-4">We usually reply within 24 hours.</p>
+              )}
             </div>
           </form>
         </div>
